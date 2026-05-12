@@ -71,48 +71,89 @@ const SORT_OPTIONS = [
 ];
 
 // ── Hero Section ──────────────────────────────────────────────────────────────
+const HERO_IMAGES = [
+  "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?w=800&q=80", // team working
+  "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&q=80", // friends smiling
+  "https://images.unsplash.com/photo-1556761175-b413da4baf72?w=800&q=80",    // people collaborating
+  "https://images.unsplash.com/photo-1543269865-cbf427effbad?w=800&q=80",    // students
+];
+
 function Hero({ isDark, stats }) {
-  const bg    = isDark ? "bg-gray-950" : "bg-slate-50";
-  const text  = isDark ? "text-white"  : "text-slate-900";
-  const sub   = isDark ? "text-gray-400" : "text-slate-500";
+  const [imgIdx, setImgIdx] = useState(0);
+  const text  = isDark ? "text-white"    : "text-slate-900";
+  const sub   = isDark ? "text-gray-300" : "text-slate-600";
+
+  useEffect(() => {
+    const t = setInterval(() => setImgIdx(i => (i + 1) % HERO_IMAGES.length), 4000);
+    return () => clearInterval(t);
+  }, []);
 
   return (
-    <section className={`relative overflow-hidden ${bg} py-24 px-6`}>
+    <section className="relative overflow-hidden min-h-[92vh] flex items-center">
+      {/* Background images with crossfade */}
+      {HERO_IMAGES.map((src, i) => (
+        <div key={src} className="absolute inset-0 transition-opacity duration-1000"
+          style={{ opacity: i === imgIdx ? 1 : 0 }}>
+          <img src={src} alt="" className="w-full h-full object-cover" />
+          <div className={`absolute inset-0 ${isDark ? "bg-gray-950/75" : "bg-slate-900/60"}`} />
+        </div>
+      ))}
+
+      {/* Glow effects */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute -top-40 -left-40 w-96 h-96 bg-cyan-500/10 rounded-full blur-3xl" />
-        <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-blue-600/10 rounded-full blur-3xl" />
+        <div className="absolute -top-40 -left-40 w-96 h-96 bg-cyan-500/20 rounded-full blur-3xl" />
+        <div className="absolute -bottom-40 -right-40 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl" />
       </div>
-      <div className="max-w-7xl mx-auto text-center relative z-10">
-        <span className="inline-flex items-center gap-2 bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 px-4 py-1.5 rounded-full text-sm font-medium mb-6">
+
+      <div className="max-w-7xl mx-auto px-6 py-24 text-center relative z-10 w-full">
+        <span className="inline-flex items-center gap-2 bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 px-4 py-1.5 rounded-full text-sm font-medium mb-6 backdrop-blur-sm">
           <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
           Now in Beta — Join for free
         </span>
-        <h1 className={`text-5xl md:text-7xl font-black leading-tight mb-6 ${text}`} style={{ fontFamily:"'Syne',sans-serif" }}>
+
+        <h1 className="text-5xl md:text-7xl font-black leading-tight mb-6 text-white"
+          style={{ fontFamily:"'Syne',sans-serif" }}>
           Connect. Share.{" "}
-          <span className="bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">Belong.</span>
+          <span className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
+            Belong.
+          </span>
         </h1>
-        <p className={`${sub} text-xl max-w-2xl mx-auto mb-10 leading-relaxed`}>
-          FaceApp is a next-generation social platform built for meaningful connections. Discover people, share stories, and build your digital identity.
+
+        <p className="text-gray-200 text-xl max-w-2xl mx-auto mb-10 leading-relaxed">
+          FaceApp is a next-generation social platform built for meaningful connections.
+          Discover people, share stories, and build your digital identity.
         </p>
+
         <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
-          <a href="/signup" className="px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold rounded-xl hover:from-cyan-400 hover:to-blue-500 transition-all shadow-xl shadow-cyan-500/25 text-sm">
+          <a href="/signup"
+            className="px-8 py-4 bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold rounded-xl hover:from-cyan-400 hover:to-blue-500 transition-all shadow-xl shadow-cyan-500/30 text-sm">
             Get Started Free →
           </a>
-          <a href="/about" className={`px-8 py-4 border font-semibold rounded-xl transition-all text-sm ${isDark ? "bg-gray-800 border-gray-700 text-white hover:bg-gray-700" : "bg-white border-slate-300 text-slate-700 hover:bg-slate-50"}`}>
+          <a href="/about"
+            className="px-8 py-4 bg-white/10 backdrop-blur-sm border border-white/20 text-white font-semibold rounded-xl hover:bg-white/20 transition-all text-sm">
             Learn More
           </a>
         </div>
+
         {/* Live Stats */}
         <div className="grid grid-cols-3 gap-6 max-w-sm mx-auto">
           {[
-            ["Members", stats.total],
-            ["Followers", (stats.totalFollowers/1000).toFixed(0)+"K"],
+            ["Members",    stats.total],
+            ["Followers",  (stats.totalFollowers/1000).toFixed(0)+"K"],
             ["Avg Rating", stats.avgRating+"★"],
           ].map(([label, val]) => (
-            <div key={label} className="text-center">
-              <div className={`text-3xl font-black ${text}`}>{val}</div>
-              <div className={`${sub} text-sm mt-1`}>{label}</div>
+            <div key={label} className="text-center backdrop-blur-sm bg-white/5 rounded-2xl py-4 px-2">
+              <div className="text-3xl font-black text-white">{val}</div>
+              <div className="text-gray-300 text-sm mt-1">{label}</div>
             </div>
+          ))}
+        </div>
+
+        {/* Image dots indicator */}
+        <div className="flex justify-center gap-2 mt-10">
+          {HERO_IMAGES.map((_, i) => (
+            <button key={i} onClick={() => setImgIdx(i)}
+              className={`w-2 h-2 rounded-full transition-all ${i === imgIdx ? "bg-cyan-400 w-6" : "bg-white/30"}`} />
           ))}
         </div>
       </div>
